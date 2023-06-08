@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-%v=0ic@%dp+rsye@_wm8!23rx(&88&1^0*zgbd5p1bhg@j#w1*'
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -76,7 +77,7 @@ SIMPLE_JWT = {
     'ISSUER': None,
     'JWK_URL': None,
     'LEEWAY': 0,
- 
+
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
@@ -94,6 +95,7 @@ SIMPLE_JWT = {
 }
 
 ROOT_URLCONF = 'myproj.urls'
+
 
 TEMPLATES = [
     {

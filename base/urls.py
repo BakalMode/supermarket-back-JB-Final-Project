@@ -9,4 +9,6 @@ urlpatterns = [
     path('', views.index),
     path("products", views.MyModelView.as_view()),
     path("products/<pk>", views.MyModelView.as_view()),
+    path('register', views.MyAuthView.register),
+    path('login', views.MyAuthView.login_view),
 ]
