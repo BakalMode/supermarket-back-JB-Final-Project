@@ -11,4 +11,9 @@ urlpatterns = [
     path("products/<pk>", views.MyModelView.as_view()),
     path('register', views.MyAuthView.register),
     path('login', views.MyAuthView.login_view),
+    path('editprofile', views.MyCustomerView.changeDetails),
+    # path('editprofile/<int:customer_id>', views.MyCustomerView.as_view()),
+    path('forgotpassword', views.lostPassword),
+    path('resetpassword', views.resetPassword),
+    path('emailcheckforregister', views.MyAuthView.emailCheckForRegister),
 ]

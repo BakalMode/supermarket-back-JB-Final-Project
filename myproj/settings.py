@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
      "corsheaders",
      'rest_framework',
      'rest_framework_simplejwt.token_blacklist',
+     'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -93,6 +93,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
 
 ROOT_URLCONF = 'myproj.urls'
 
@@ -168,4 +169,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
-
