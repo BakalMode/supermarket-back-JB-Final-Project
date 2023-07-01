@@ -28,7 +28,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     address = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True,upload_to="images")
     last_login = models.DateTimeField(auto_now=True)
     token = models.CharField(max_length=255, blank=True, null=True)
 
@@ -70,20 +70,34 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         related_query_name='customer'
     )
 
+class Categories(models.Model):
+    category=models.CharField(max_length=30,null=True,blank=True)
+    category_image = models.ImageField(blank=True, null=True)
 
+
+    fields =[category]
+ 
+    def __str__(self):
+           return self.category
 
 class Product(models.Model):
     name = models.CharField(max_length=50,null=True,blank=True)
     price = models.DecimalField(max_digits=5,decimal_places=2)
     createdTime=models.DateTimeField(auto_now_add=True)
     season=models.CharField(max_length=50,null=True,blank=True)
-    category=models.CharField(max_length=50,null=True,blank=True)
-    image=models.ImageField( blank=True,null=True) 
+    category = models.ForeignKey(Categories, on_delete=models.CASCADE, null=True, blank=True)
+    image=models.ImageField( blank=True,null=True,upload_to="images") 
+    description= models.CharField(max_length=300,null=True,blank=True)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
 
-    fields =['name','price','image']
+    fields =['name','price','image','category']
  
     def __str__(self):
            return self.name
+    
+    @property
+    def category_name(self):
+        return self.category.category
     
 class Purchases(models.Model):
     order_ID=models.DecimalField(max_digits=100,decimal_places=0)
@@ -111,10 +125,4 @@ class Reviews(models.Model):
            return self.user_ID
     
 
-class Categories(models.Model):
-    category=models.CharField(max_length=30,null=True,blank=True)
 
-    fields =[]
- 
-    def __str__(self):
-           return self.category

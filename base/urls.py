@@ -16,4 +16,10 @@ urlpatterns = [
     path('forgotpassword', views.lostPassword),
     path('resetpassword', views.resetPassword),
     path('emailcheckforregister', views.MyAuthView.emailCheckForRegister),
+    path('getcustomer', views.MyCustomerView.getCustomer),
+    path('menu', views.menu_view),
 ]
+
+
+
+

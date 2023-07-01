@@ -27,18 +27,6 @@ from django.contrib.auth.tokens import default_token_generator
 from urllib.parse import parse_qs, urlparse
 
 
-
-
-
-
-
-# Create your views here.
-@api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-def about(req):
-    return Response("about")
-
-
 # @permission_classes([IsAuthenticated])
 class MyModelView(APIView):
     """
@@ -146,31 +134,10 @@ class MyCustomerView(APIView):
     """
     This class handles the Customer operations for MyModel
     """
-    
-    def getCustomer(self, request, customer_id):
-        # Retrieve the customer from the database
-        try:
-            customer = Customer.objects.get(pk=customer_id)
-        except Customer.DoesNotExist:
-            return Response({'message': 'Customer not found'}, status=404)
-
-        # Return the customer's data
-        data = {
-            'customerID': customer.customerID,
-            'firstName': customer.firstName,
-            'lastName': customer.lastName,
-            'email': customer.email,
-            'address': customer.address,
-            'city': customer.city,
-        }
-        return Response(data)
-    
-    
-    @api_view(['PATCH'])
-    def changeDetails(request):
+    @api_view(['POST'])
+    def getCustomer(request):
         authorization_header = json.loads(request.body)["Authorization"]
-        custoerChanges = json.loads(request.body)["userChanges"]
-  
+
         if not authorization_header or 'Bearer ' not in authorization_header:
             return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -188,8 +155,46 @@ class MyCustomerView(APIView):
             customer = Customer.objects.get(customerID=customerID)
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Return the customer's data
+        data = {
+            'customerID': customer.customerID,
+            'firstName': customer.firstName,
+            'lastName': customer.lastName,
+            'email': customer.email,
+            'address': customer.address,
+            'city': customer.city,
+        }
+        print(data)
+        return Response(data)
+    
+    
+
+    @api_view(['PATCH'])
+    def changeDetails(request):
+        authorization_header = json.loads(request.body)["Authorization"]
+        custoerChanges = json.loads(request.body)["userChanges"]
+
+        if not authorization_header or 'Bearer ' not in authorization_header:
+            return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # Extract the token from the header
+            token = authorization_header.split(' ')[1]
+            
+            # Decode the token and retrieve the customerID
+            payload = jwt.decode(token, 'secret_key', algorithms=['HS256'])
+            customerID = payload['customerID']
+            
+        except (jwt.exceptions.DecodeError, IndexError, KeyError):
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            customer = Customer.objects.get(customerID=customerID)
+        except Customer.DoesNotExist:
+            return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+        
         # Update the fields based on the provided data
-        if  custoerChanges['profileData']['firstName'] != '': #need to change user to changeUser fields
+        if custoerChanges['profileData']['firstName'] != '':
             customer.firstName = custoerChanges['profileData']['firstName']
         if custoerChanges['profileData']['lastName'] != '':
             customer.lastName = custoerChanges['profileData']['lastName']
@@ -199,7 +204,10 @@ class MyCustomerView(APIView):
             customer.address = custoerChanges['profileData']['address']
         if custoerChanges['profileData']['city'] != '':
             customer.city = custoerChanges['profileData']['city']
-        # Need to update password too but i need to figure out how do i incrypet in when udating!!!!!!!!
+        if custoerChanges['profileData']['password'] != '':
+            # Encode the password using make_password()
+            new_password = custoerChanges['profileData']['password']
+            customer.password = make_password(new_password)
 
         # Save the changes
         customer.save()
@@ -207,6 +215,7 @@ class MyCustomerView(APIView):
         # Return the updated customer's data
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
+
     
 
 
@@ -255,7 +264,18 @@ def resetPassword(request):
     customer.token = ''
     customer.save()
     return Response('Password reset successfully', status=200)
-    
-  
 
-   
+
+
+
+#this is for diplaying the categories in the navbar
+from .models import Categories
+
+@api_view(['GET'])
+def menu_view(request):
+    categories = Categories.objects.all()
+    category_names = [category.category for category in categories]
+
+    print(category_names)
+    return Response(category_names)
+
