@@ -25,6 +25,14 @@ from datetime import datetime, timedelta
 import json
 from django.contrib.auth.tokens import default_token_generator
 from urllib.parse import parse_qs, urlparse
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import BytesIO
+import base64
+import os
+from django.core.files.storage import default_storage
+
+
 
 
 # @permission_classes([IsAuthenticated])
@@ -164,6 +172,7 @@ class MyCustomerView(APIView):
             'email': customer.email,
             'address': customer.address,
             'city': customer.city,
+            'image': customer.image.name,
         }
         print(data)
         return Response(data)
@@ -173,7 +182,7 @@ class MyCustomerView(APIView):
     @api_view(['PATCH'])
     def changeDetails(request):
         authorization_header = json.loads(request.body)["Authorization"]
-        custoerChanges = json.loads(request.body)["userChanges"]
+        customerChanges = json.loads(request.body)["userChanges"]
 
         if not authorization_header or 'Bearer ' not in authorization_header:
             return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
@@ -193,20 +202,37 @@ class MyCustomerView(APIView):
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
         
+        # Delete the old image if it exists
+        if customer.image:
+            # Get the path of the old image
+            image_path = customer.image.path
+            
+            # Delete the image file from storage
+            if default_storage.exists(image_path):
+                default_storage.delete(image_path)
+        
         # Update the fields based on the provided data
-        if custoerChanges['profileData']['firstName'] != '':
-            customer.firstName = custoerChanges['profileData']['firstName']
-        if custoerChanges['profileData']['lastName'] != '':
-            customer.lastName = custoerChanges['profileData']['lastName']
-        if custoerChanges['profileData']['email'] != '':
-            customer.email = custoerChanges['profileData']['email']
-        if custoerChanges['profileData']['address'] != '':
-            customer.address = custoerChanges['profileData']['address']
-        if custoerChanges['profileData']['city'] != '':
-            customer.city = custoerChanges['profileData']['city']
-        if custoerChanges['profileData']['password'] != '':
+        if customerChanges['profileData']['firstName'] != '':
+            customer.firstName = customerChanges['profileData']['firstName']
+        if customerChanges['profileData']['lastName'] != '':
+            customer.lastName = customerChanges['profileData']['lastName']
+        if customerChanges['profileData']['email'] != '':
+            customer.email = customerChanges['profileData']['email']
+        if customerChanges['profileData']['address'] != '':
+            customer.address = customerChanges['profileData']['address']
+        if customerChanges['profileData']['city'] != '':
+            customer.city = customerChanges['profileData']['city']
+        if customerChanges['profileData']['selectedImage'] != '':
+            image_data = customerChanges['profileData']['selectedImage']
+            format, imgstr = image_data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            # Create a file from the base64 image data
+            image = ContentFile(base64.b64decode(imgstr), name=f"image.{ext}")
+            customer.image = image
+        if customerChanges['profileData']['password'] != '':
             # Encode the password using make_password()
-            new_password = custoerChanges['profileData']['password']
+            new_password = customerChanges['profileData']['password']
             customer.password = make_password(new_password)
 
         # Save the changes
@@ -216,6 +242,8 @@ class MyCustomerView(APIView):
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
 
+
+#  all that is left here is when a customer changes his image to check if he had one before and delte it @!!!!!!!!!
     
 
 
@@ -279,3 +307,20 @@ def menu_view(request):
     print(category_names)
     return Response(category_names)
 
+@api_view(['POST'])
+def get_product_fields(request):
+    try:
+        id = request.data.get('id')  # Access the ID value from the request data
+        product = Product.objects.get(id=id)
+        data = {
+            'name': product.name,
+            'price': str(product.price),
+            'season': product.season,
+            'category': str(product.category),
+            'image': product.image.name if product.image else None,
+            'description': product.description,
+            'rating': str(product.rating),
+        }
+        return Response({'data': data})
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)

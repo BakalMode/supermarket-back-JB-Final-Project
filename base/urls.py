@@ -18,6 +18,7 @@ urlpatterns = [
     path('emailcheckforregister', views.MyAuthView.emailCheckForRegister),
     path('getcustomer', views.MyCustomerView.getCustomer),
     path('menu', views.menu_view),
+    path('getproductfields', views.get_product_fields),
 ]
 
 
