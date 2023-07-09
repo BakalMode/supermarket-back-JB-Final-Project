@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Product
+from .models import Product, Purchases
 from .Serializer import CustomerSerializer, ProductSerializer
 from rest_framework.decorators import api_view, permission_classes,authentication_classes
 from rest_framework.views import APIView
@@ -241,12 +241,7 @@ class MyCustomerView(APIView):
         # Return the updated customer's data
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
-
-
-#  all that is left here is when a customer changes his image to check if he had one before and delte it @!!!!!!!!!
     
-
-
 
 
 @api_view(['POST'])
@@ -324,3 +319,51 @@ def get_product_fields(request):
         return Response({'data': data})
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=404)
+
+
+@api_view(['POST'])
+def add_purchase(request):
+    
+    try:
+        authorization_header = json.loads(request.body)["Authorization"]
+        print(authorization_header)
+    except (json.JSONDecodeError, KeyError):
+        authorization_header = ""
+
+    if not authorization_header or 'Bearer ' not in authorization_header:
+        # Set user_ID to formData username
+        form_data = json.loads(request.body)['data']['formData']
+        customerID = form_data.get('firstName')
+
+        # Check if username is provided in formData
+        if not customerID:
+            return Response({"error": "Invalid authorization header and missing username"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        try:
+            # Extract the token from the header
+            token = authorization_header.split(' ')[1]
+            
+            # Decode the token and retrieve the customerID
+            payload = jwt.decode(token, 'secret_key', algorithms=['HS256'])
+            customerID = payload['customerID']
+
+        except (jwt.exceptions.DecodeError, IndexError, KeyError):
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            customer = Customer.objects.get(customerID=customerID)
+        except Customer.DoesNotExist:
+            return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    purchase_date = datetime.now()
+    form_data = json.loads(request.body)['data']['formData']
+    cart_items = request.data['data']['cartItems']
+
+    if not authorization_header or 'Bearer ' not in authorization_header:
+        purchase = Purchases(user_ID=f"guest:{customerID}", purchase_date=purchase_date, OrderSummary=cart_items, DeliveryDetails=form_data)
+    else:
+        purchase = Purchases(user_ID=customerID, purchase_date=purchase_date, OrderSummary=cart_items, DeliveryDetails=form_data)
+    
+    purchase.save()
+
+    return Response("Purchase added successfully!")

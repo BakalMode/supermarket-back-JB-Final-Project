@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import check_password
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 
+
 class CustomerManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
@@ -99,17 +100,33 @@ class Product(models.Model):
     def category_name(self):
         return self.category.category
     
+from django.db import models
+import json
+
 class Purchases(models.Model):
-    order_ID=models.DecimalField(max_digits=100,decimal_places=0)
-    user_ID=models.DecimalField(max_digits=100,decimal_places=0)
-    purchase_date=models.DateTimeField(auto_now_add=True) 
-    List_of_product_ID=models # i didnt finish this field
+    purchaseID = models.AutoField(primary_key=True)
+    user_ID = models.TextField(null=False)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    OrderSummary = models.TextField(blank=True, null=True)
+    DeliveryDetails = models.TextField(blank=True, null=True)
 
+    fields = ['purchaseID']
 
-    fields =[]
- 
+    def set_order_summary(self, data):
+        self.OrderSummary = json.dumps(data)
+
+    def get_order_summary(self):
+        return json.loads(self.OrderSummary) if self.OrderSummary else []
+
+    def set_delivery_details(self, data):
+        self.DeliveryDetails = json.dumps(data)
+
+    def get_delivery_details(self):
+        return json.loads(self.DeliveryDetails) if self.DeliveryDetails else []
+
     def __str__(self):
-           return self.order_ID
+        return str(self.purchaseID)
+
     
 
 class Reviews(models.Model):
@@ -119,10 +136,10 @@ class Reviews(models.Model):
     List_of_product_ID=models # i didnt finish this field
     stars=models.DecimalField(max_digits=1,decimal_places=0)
 
-    fields =[]
+    fields =['product_ID']
  
     def __str__(self):
-           return self.user_ID
+           return self.product_ID
     
 
 

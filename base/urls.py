@@ -19,6 +19,7 @@ urlpatterns = [
     path('getcustomer', views.MyCustomerView.getCustomer),
     path('menu', views.menu_view),
     path('getproductfields', views.get_product_fields),
+    path('addpurchase', views.add_purchase),
 ]
 
 

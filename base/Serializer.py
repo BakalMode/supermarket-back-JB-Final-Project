@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Categories, Product,Customer
+from .models import Categories, Product,Customer, Purchases
 
 
 
@@ -23,3 +23,9 @@ class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categories
         fields = ['category']
+
+
+class PurchesesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchases
+        fields = '__all__'
