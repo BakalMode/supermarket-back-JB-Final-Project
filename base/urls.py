@@ -20,6 +20,7 @@ urlpatterns = [
     path('menu', views.menu_view),
     path('getproductfields', views.get_product_fields),
     path('addpurchase', views.add_purchase),
+    path('createreview', views.createReview),  
 ]
 
 

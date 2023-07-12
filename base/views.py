@@ -31,6 +31,7 @@ from io import BytesIO
 import base64
 import os
 from django.core.files.storage import default_storage
+import json
 
 
 
@@ -314,11 +315,12 @@ def get_product_fields(request):
             'category': str(product.category),
             'image': product.image.name if product.image else None,
             'description': product.description,
-            'rating': str(product.rating),
+            'reviews': str(product.reviews) if product.reviews is not None else None,
         }
         return Response({'data': data})
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=404)
+
 
 
 @api_view(['POST'])
@@ -367,3 +369,65 @@ def add_purchase(request):
     purchase.save()
 
     return Response("Purchase added successfully!")
+
+import ast
+@api_view(['POST'])
+def createReview(request):
+    authorization_header = json.loads(request.body)["Authorization"]
+
+    if not authorization_header or 'Bearer ' not in authorization_header:
+        return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Extract the token from the header
+        token = authorization_header.split(' ')[1]
+
+        # Decode the token and retrieve the customerID
+        payload = jwt.decode(token, 'secret_key', algorithms=['HS256'])
+        customerID = payload['customerID']
+
+    except (jwt.exceptions.DecodeError, IndexError, KeyError):
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        customer = Customer.objects.get(customerID=customerID)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    review_data = request.data.get('review')  # Get the 'review' part of the data
+    product_id = review_data.get('productId')
+    review_text = review_data.get('reviewText')
+
+    try:
+        product = Product.objects.get(id=product_id)
+
+        if not Purchases.objects.filter(user_ID=customerID).exists():
+            return Response({"error": "Customer has not made any purchases"}, status=status.HTTP_403_FORBIDDEN)
+
+        purchase = Purchases.objects.get(user_ID=customerID)
+        order_summary = ast.literal_eval(purchase.OrderSummary)
+
+        for item in order_summary:
+            if item['product']['id'] == int(product_id):
+                # Product ID exists in order_summary
+                break
+        else:
+            # Product ID does not exist in order_summary
+            return Response({"error": "Customer has not purchased the product"}, status=status.HTTP_403_FORBIDDEN)
+
+
+
+    
+        reviews = product.get_reviwes()
+
+        reviews.append(review_text)
+        product.set_reviews(reviews)
+        product.save()
+        return Response({'success': True})
+    
+    except Product.DoesNotExist:
+        return Response({'success': False, 'error': 'Product not found'})
+    
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)})
+    

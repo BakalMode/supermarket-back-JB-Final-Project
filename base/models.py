@@ -89,9 +89,15 @@ class Product(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, null=True, blank=True)
     image=models.ImageField( blank=True,null=True,upload_to="images") 
     description= models.CharField(max_length=300,null=True,blank=True)
-    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
-
+    reviews = models.TextField(blank=True, null=True)
     fields =['name','price','image','category']
+
+
+    def set_reviews(self, data):
+        self.reviews = json.dumps(data)
+
+    def get_reviwes(self):
+        return json.loads(self.reviews) if self.reviews else []
  
     def __str__(self):
            return self.name
@@ -134,7 +140,6 @@ class Reviews(models.Model):
     user_ID=models.DecimalField(max_digits=100,decimal_places=0)
     text=models.CharField(max_length=1200,null=True,blank=True)
     List_of_product_ID=models # i didnt finish this field
-    stars=models.DecimalField(max_digits=1,decimal_places=0)
 
     fields =['product_ID']
  
