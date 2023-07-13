@@ -175,7 +175,6 @@ class MyCustomerView(APIView):
             'city': customer.city,
             'image': customer.image.name,
         }
-        print(data)
         return Response(data)
     
     
@@ -265,7 +264,6 @@ def lostPassword(request):
         'email': customer.email,
         'token': token,
     }
-    print(data)
     return Response(data)
 
 
@@ -300,7 +298,6 @@ def menu_view(request):
     categories = Categories.objects.all()
     category_names = [category.category for category in categories]
 
-    print(category_names)
     return Response(category_names)
 
 @api_view(['POST'])
@@ -328,7 +325,6 @@ def add_purchase(request):
     
     try:
         authorization_header = json.loads(request.body)["Authorization"]
-        print(authorization_header)
     except (json.JSONDecodeError, KeyError):
         authorization_header = ""
 
@@ -430,4 +426,3 @@ def createReview(request):
     
     except Exception as e:
         return Response({'success': False, 'error': str(e)})
-    
