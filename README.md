@@ -24,5 +24,5 @@ run this commad to start the server:
 
 and setting up the allowed hosts in settings.py:
 ["*"] for all hosts and ["your front end server"] for a proper setup
-![HOSTS](readmeImages/allowed hosts.jpg)
+![HOSTS](readmeImages/allowed_hosts.jpg)
 
