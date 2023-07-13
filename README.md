@@ -7,14 +7,14 @@ you can do that here: https://github.com/BakalMode/supermarket-front-JB-Final-Pr
 ## setting up instructaions:
 
 creating a virtual environment:                                                                
-!!check if one already exists before creating a new one!!
+**!!check if one already exists before creating a new one!!**
 - python -m virtualenv myenv
 
 activate the virtual environment:
 - Windows: myenv\Scripts\activate
 - macOS/Linux: source myenv/bin/activate
 
-after activating the virtual environment it will appear like this:                                       
+if activated currectly the virtual environment should appear like so:                                       
 ![EnvCheck](readmeImages/envcheck.jpg)
 
                                                                                                             
@@ -27,5 +27,5 @@ run this commad to start the server:
 
 and setting up the allowed hosts in settings.py:
 ["*"] for all hosts and ["your front end server"] for a proper setup
-![HOSTS](readmeImages/allowed_hosts.jpg)
+![HOSTS](readmeImages/allowed_hosts2.jpg)
 
