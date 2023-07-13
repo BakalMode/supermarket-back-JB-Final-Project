@@ -14,7 +14,7 @@ activate the virtual environment:
 - Windows: myenv\Scripts\activate
 - macOS/Linux: source myenv/bin/activate
 
-installing the requirements.txt file:
+installing the requirements.txt file:                                                               
 so all the requiered packages will be installed in your virtual environment
 - pip install -r requirements.txt
 
