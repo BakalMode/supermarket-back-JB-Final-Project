@@ -14,6 +14,10 @@ activate the virtual environment:
 - Windows: myenv\Scripts\activate
 - macOS/Linux: source myenv/bin/activate
 
+after activating the virtual environment it will appear like this:                                       
+![EnvCheck](readmeImages/envcheck.jpg)
+
+                                                                                                            
 installing the requirements.txt file:                                                               
 so all the requiered packages will be installed in your virtual environment
 - pip install -r requirements.txt
