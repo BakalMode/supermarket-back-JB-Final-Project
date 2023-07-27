@@ -1,10 +1,10 @@
-# my final Jhon Bryce project commerce app
+# My final Jhon Bryce project commerce app
 
-in order to set up the app you will also need to set up the front-end part of the project
+**in order to set up the app you will also need to set up the front-end part of the project**
 you can do that here: https://github.com/BakalMode/supermarket-front-JB-Final-Project
 
 
-## setting up instructaions:
+## Setting up instructaions: (without using docker)
 
 creating a virtual environment:                                                                
 **!!check if one already exists before creating a new one!!**

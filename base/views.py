@@ -76,7 +76,7 @@ class MyAuthView(APIView):
 
             # Checking if the email already exists
             if Customer.objects.filter(email=email).exists():
-                return Response({"message": "Email is already in use"})
+                return Response({"message": "Email is already in use"}, status=401)
 
             # Create a new customer object
             customer = Customer(
@@ -183,7 +183,7 @@ class MyCustomerView(APIView):
     def changeDetails(request):
         authorization_header = json.loads(request.body)["Authorization"]
         customerChanges = json.loads(request.body)["userChanges"]
-
+        print(customerChanges)
         if not authorization_header or 'Bearer ' not in authorization_header:
             return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -201,15 +201,7 @@ class MyCustomerView(APIView):
             customer = Customer.objects.get(customerID=customerID)
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Delete the old image if it exists
-        if customer.image:
-            # Get the path of the old image
-            image_path = customer.image.path
-            
-            # Delete the image file from storage
-            if default_storage.exists(image_path):
-                default_storage.delete(image_path)
+
         
         # Update the fields based on the provided data
         if customerChanges['profileData']['firstName'] != '':
@@ -222,19 +214,41 @@ class MyCustomerView(APIView):
             customer.address = customerChanges['profileData']['address']
         if customerChanges['profileData']['city'] != '':
             customer.city = customerChanges['profileData']['city']
-        if customerChanges['profileData']['selectedImage'] != '':
-            image_data = customerChanges['profileData']['selectedImage']
-            format, imgstr = image_data.split(';base64,')
-            ext = format.split('/')[-1]
+        
+        if 'selectedImage' in customerChanges['profileData']:
+            if customerChanges['profileData']['selectedImage'] != '' and "http://127.0.0.1:8000/images" not in customerChanges['profileData']['selectedImage']:
+                image_data = customerChanges['profileData']['selectedImage']
+                format, imgstr = image_data.split(';base64,')
+                ext = format.split('/')[-1]
 
-            # Create a file from the base64 image data
-            image = ContentFile(base64.b64decode(imgstr), name=f"image.{ext}")
-            customer.image = image
+                # Delete the old image if it exists
+                if customer.image:
+                # Get the path of the old image
+                    image_path = customer.image.path
+            
+                    # Delete the image file from storage
+                    if default_storage.exists(image_path):
+                        default_storage.delete(image_path)
+
+                # Create a file from the base64 image data
+                image = ContentFile(base64.b64decode(imgstr), name=f"image.{ext}")
+                customer.image = image
+        
+        #if the person chose to remove the picture this will happen        
+        else:
+            if customer.image:
+                image_path = customer.image.path
+                if default_storage.exists(image_path):
+                    default_storage.delete(image_path)
+            customer.image = ""
+            
+
+
         if customerChanges['profileData']['password'] != '':
             # Encode the password using make_password()
             new_password = customerChanges['profileData']['password']
             customer.password = make_password(new_password)
-
+       
         # Save the changes
         customer.save()
 
@@ -426,3 +440,77 @@ def createReview(request):
     
     except Exception as e:
         return Response({'success': False, 'error': str(e)})
+
+
+from rest_framework.response import Response
+from rest_framework import status
+import jwt
+import ast
+
+@api_view(['POST'])
+def purchasedBefore(request):
+    authorization_header = json.loads(request.body)["Authorization"]
+
+    if not authorization_header or 'Bearer ' not in authorization_header:
+        return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Extract the token from the header
+        token = authorization_header.split(' ')[1]
+
+        # Decode the token and retrieve the customerID
+        payload = jwt.decode(token, 'secret_key', algorithms=['HS256'])
+        customerID = payload['customerID']
+
+    except (jwt.exceptions.DecodeError, IndexError, KeyError):
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        customer = Customer.objects.get(customerID=customerID)
+    except Customer.DoesNotExist:
+        return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    product_id = request.data.get('idd')  # Get the 'review' part of the data
+
+    try:
+        product = Product.objects.get(id=product_id)
+
+        # Retrieve all purchases for the customer
+        purchases = Purchases.objects.filter(user_ID=customerID)
+
+        if not purchases.exists():
+            return Response({"error": "Customer has not made any purchases"})
+
+        for purchase in purchases:
+            order_summary = ast.literal_eval(purchase.OrderSummary)
+            for item in order_summary:
+                if item['product']['id'] == int(product_id):
+                    # Product ID exists in order_summary
+                    return Response({'data': True}) 
+
+        # Product ID does not exist in any of the orders
+        return Response({'data': False})
+
+    except Product.DoesNotExist:
+        return Response({'data': False})
+
+    except Exception as e:
+        return Response({'data': False})
+
+    
+
+@api_view(['POST']) #this was added so you would'nt be able to just change the cart local storage and mess with the price :)
+def calcTotal(request):
+    cart = request.data
+    total_cost = 0
+    for cart_item in cart:
+        product_id = cart_item['product']['id']
+        quantity = cart_item['quantity']
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': f'Product with id {product_id} does not exist.'}, status=400)
+
+        total_cost += product.price * quantity
+    return Response({'total_cost': total_cost})

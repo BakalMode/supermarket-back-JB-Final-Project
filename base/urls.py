@@ -12,7 +12,6 @@ urlpatterns = [
     path('register', views.MyAuthView.register),
     path('login', views.MyAuthView.login_view),
     path('editprofile', views.MyCustomerView.changeDetails),
-    # path('editprofile/<int:customer_id>', views.MyCustomerView.as_view()),
     path('forgotpassword', views.lostPassword),
     path('resetpassword', views.resetPassword),
     path('emailcheckforregister', views.MyAuthView.emailCheckForRegister),
@@ -21,6 +20,10 @@ urlpatterns = [
     path('getproductfields', views.get_product_fields),
     path('addpurchase', views.add_purchase),
     path('createreview', views.createReview),  
+    path('purchasedbefore', views.purchasedBefore),
+    path('calctotal', views.calcTotal),  
+  
+
 ]
 
 
