@@ -10,7 +10,7 @@ creating a virtual environment:
 **!!check if one already exists before creating a new one!!**
 -      python -m virtualenv myenv
 
-activate the virtual environment:
+activate the virtual environment:                                                                                                       
 Windows:                                                                                                                                
 -      myenv\Scripts\activate
 macOS/Linux:                                                                                                                            
