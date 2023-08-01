@@ -31,7 +31,7 @@ from io import BytesIO
 import base64
 import os
 from django.core.files.storage import default_storage
-import json
+import ast
 
 
 
@@ -183,7 +183,6 @@ class MyCustomerView(APIView):
     def changeDetails(request):
         authorization_header = json.loads(request.body)["Authorization"]
         customerChanges = json.loads(request.body)["userChanges"]
-        print(customerChanges)
         if not authorization_header or 'Bearer ' not in authorization_header:
             return Response({"error": "Invalid authorization header"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -380,7 +379,6 @@ def add_purchase(request):
 
     return Response("Purchase added successfully!")
 
-import ast
 @api_view(['POST'])
 def createReview(request):
     authorization_header = json.loads(request.body)["Authorization"]
@@ -442,10 +440,7 @@ def createReview(request):
         return Response({'success': False, 'error': str(e)})
 
 
-from rest_framework.response import Response
-from rest_framework import status
-import jwt
-import ast
+
 
 @api_view(['POST'])
 def purchasedBefore(request):

@@ -1,4 +1,4 @@
-# My final Jhon Bryce project commerce app
+# FreshBuy backend
 
 **in order to set up the app you will also need to set up the front-end part of the project**
 you can do that here: https://github.com/BakalMode/supermarket-front-JB-Final-Project
