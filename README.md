@@ -8,11 +8,11 @@ you can do that here: https://github.com/BakalMode/supermarket-front-JB-Final-Pr
 
 creating a virtual environment:                                                                
 **!!check if one already exists before creating a new one!!**
-- python -m virtualenv myenv
+-      python -m virtualenv myenv
 
 activate the virtual environment:
-- Windows: myenv\Scripts\activate
-- macOS/Linux: source myenv/bin/activate
+-      Windows: myenv\Scripts\activate
+-      macOS/Linux: source myenv/bin/activate
 
 if activated currectly the virtual environment should appear like so:                                       
 ![EnvCheck](readmeImages/envcheck.jpg)
@@ -20,10 +20,10 @@ if activated currectly the virtual environment should appear like so:
                                                                                                             
 installing the requirements.txt file:                                                               
 so all the requiered packages will be installed in your virtual environment
-- pip install -r requirements.txt
+-      pip install -r requirements.txt
 
 run this commad to start the server:
-- python manage.py runserver
+-      python manage.py runserver
 
 and setting up the allowed hosts in settings.py:
 ["*"] for all hosts and ["your front end server"] for a proper setup

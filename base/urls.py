@@ -23,7 +23,6 @@ urlpatterns = [
     path('purchasedbefore', views.purchasedBefore),
     path('calctotal', views.calcTotal),  
   
-
 ]
 
 
