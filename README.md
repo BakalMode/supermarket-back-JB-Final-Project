@@ -11,8 +11,10 @@ creating a virtual environment:
 -      python -m virtualenv myenv
 
 activate the virtual environment:
--      Windows: myenv\Scripts\activate
--      macOS/Linux: source myenv/bin/activate
+Windows:                                                                                                                                
+-      myenv\Scripts\activate
+macOS/Linux:                                                                                                                            
+-      source myenv/bin/activate
 
 if activated currectly the virtual environment should appear like so:                                       
 ![EnvCheck](readmeImages/envcheck.jpg)
