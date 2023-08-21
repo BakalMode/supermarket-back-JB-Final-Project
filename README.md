@@ -31,3 +31,12 @@ and setting up the allowed hosts in settings.py:
 ["*"] for all hosts and ["your front end server"] for a proper setup
 ![HOSTS](readmeImages/allowed_hosts2.jpg)
 
+=======
+# supermarket-back
+John Bryce final project e commerce app developed in:
+FrontEnd Typescript React Redux
+backEnd Django
+
+Project contaion:
+(in progress)
+
