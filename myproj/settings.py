@@ -4,9 +4,10 @@ import os
 from dotenv import load_dotenv
 
 
-if(os.environ['ENV']=='production'):
-    load_dotenv('/etc/secrets/.env')
-else: load_dotenv()
+# if(os.environ['ENV']=='production'):
+#     load_dotenv('/etc/secrets/.env')
+# else: load_dotenv()
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,7 +22,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [os.environ['REACT_APP_HOST']]
 
@@ -171,4 +172,5 @@ IMAGES_ROOT = os.path.join(BASE_DIR, 'images/')
 
 STATICFILES_DIRS = [
     BASE_DIR / "images",
+    "/var/www/images/",
 ]
