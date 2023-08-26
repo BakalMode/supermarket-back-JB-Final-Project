@@ -4,9 +4,10 @@ import os
 from dotenv import load_dotenv
 
 
-if(os.environ['ENV']=='production'):
-    load_dotenv('/etc/secrets/.env')
-else: load_dotenv()
+# if(os.environ['ENV']=='production'):
+#     load_dotenv('/etc/secrets/.env')
+# else: load_dotenv()
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
